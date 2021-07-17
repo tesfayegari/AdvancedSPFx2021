@@ -6,4 +6,9 @@ Wednesdays: 6:00 PM Eastern Standard
 Recap: 
 
 
+Resources: https://github.com/tesfayegari/AdvancedSPFx2021
+
+
+
+
 
