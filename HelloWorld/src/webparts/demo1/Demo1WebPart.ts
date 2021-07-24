@@ -4,33 +4,20 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { escape } from '@microsoft/sp-lodash-subset';
 
-import styles from './Demo1WebPart.module.scss';
-import * as strings from 'Demo1WebPartStrings';
 
 export interface IDemo1WebPartProps {
   description: string;
+  fullName: string;
 }
 
 export default class Demo1WebPart extends BaseClientSideWebPart<IDemo1WebPartProps> {
 
-  public render(): void {
+  public render(): void { 
     this.domElement.innerHTML = `
-      <div class="${ styles.demo1 }">
-        <div class="${ styles.container }">
-          <div class="${ styles.row }">
-            <div class="${ styles.column }">
-              <span class="${ styles.title }">Welcome to SharePoint!</span>
-              <p class="${ styles.subTitle }">Customize SharePoint experiences using Web Parts.</p>
-              <p class="${ styles.description }">${escape(this.properties.description)}</p>
-              <a href="https://aka.ms/spfx" class="${ styles.button }">
-                <span class="${ styles.label }">Learn more</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>`;
+                            <h1>This is a text too</h1>
+                            <div class="class1>${this.properties.fullName}</div>
+                            `;
   }
 
   protected get dataVersion(): Version {
@@ -42,14 +29,17 @@ export default class Demo1WebPart extends BaseClientSideWebPart<IDemo1WebPartPro
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: 'Webpart Properties'
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: 'General Settings',
               groupFields: [
                 PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                  label: 'Description'
+                }),
+                PropertyPaneTextField('fullName', {
+                  label: 'Type Your Name'
                 })
               ]
             }
