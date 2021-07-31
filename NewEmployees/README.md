@@ -21,21 +21,6 @@ Short summary on functionality and used technologies.
 
 > Any special pre-requisites?
 
-## Solution
-
-Solution|Author(s)
---------|---------
-folder name | Author details (name, company, twitter alias with link)
-
-## Version history
-
-Version|Date|Comments
--------|----|--------
-1.1|March 10, 2021|Update comment
-1.0|January 29, 2021|Initial release
-
-## Disclaimer
-
 **THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
 
 ---
@@ -50,24 +35,41 @@ Version|Date|Comments
 
 > Include any additional steps as needed.
 
-## Features
+## SharePoint REST API endpoints
 
-Description of the extension that expands upon high-level summary above.
+Web Information 
+YourSite/_api/web
 
-This extension illustrates the following concepts:
+All lists 
+site/_api/web/lists
 
-- topic 1
-- topic 2
-- topic 3
+Select specific properties of lists, use oData $select=Prop1,Prop2,...
 
-> Notice that better pictures and documentation will increase the sample usage and the value you are providing for others. Thanks for your submissions advance.
+site/_api/web/lists?$select=Title,ItemCount,Hidden
 
-> Share your web part with others through Microsoft 365 Patterns and Practices program to get visibility and exposure. More details on the community, open-source projects and other activities from http://aka.ms/m365pnp.
+Filtering oData Show only non hidden lists 
+use oData called $filter=expression
+example 
+$filter=Hidden eq false
 
-## References
+Get Specific List  
+1. By its guid 
+Exmple 
+/_api/Web/Lists(guid'4b46f02e-f41f-408d-8f01-19de6dac4ef6')
+2. By its Title 
+Example
+/_api/Web/Lists/getbytitle('Customers')
 
-- [Getting started with SharePoint Framework](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
-- [Building for Microsoft teams](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/build-for-teams-overview)
-- [Use Microsoft Graph in your solution](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/web-parts/get-started/using-microsoft-graph-apis)
-- [Publish SharePoint Framework applications to the Marketplace](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/publish-to-marketplace-overview)
-- [Microsoft 365 Patterns and Practices](https://aka.ms/m365pnp) - Guidance, tooling, samples and open-source controls for your Microsoft 365 development
+Get items in a list 
+example
+/_api/Web/Lists/getbytitle('ListTitle')/items
+/_api/Web/Lists(guid'4b46f02e-f41f-408d-8f01-19de6dac4ef6')/items
+
+Lookup columns and people or group needs to be expanded to see the value 
+use odata $expand
+Example Created by Column is expanded as shown
+/_api/Web/Lists(guid'4b46f02e-f41f-408d-8f01-19de6dac4ef6')/items?$select=Title,last_name,Author/Title,Author/ID,Author/EMail&$expand=Author
+
+One item by id 
+example 
+/_api/Web/Lists(guid'4b46f02e-f41f-408d-8f01-19de6dac4ef6')/items(4)

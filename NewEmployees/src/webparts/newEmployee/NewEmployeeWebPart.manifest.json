@@ -21,7 +21,9 @@
     "description": { "default": "A webpart that displays intro and pictures of new employee from a list" },
     "officeFabricIconFontName": "Group",
     "properties": {
-      "description": "NewEmployee"
+      "description": "New Employees",
+      "listName": "Employees",
+      "maxItems": 5
     }
   }]
 }
