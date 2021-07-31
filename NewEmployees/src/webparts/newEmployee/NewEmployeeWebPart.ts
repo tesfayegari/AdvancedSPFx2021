@@ -35,7 +35,7 @@ export default class NewEmployeeWebPart extends BaseClientSideWebPart<INewEmploy
 
     this.domElement.innerHTML = `
     <h2>${this.properties.description} </h2>
-    ${this.renderRowHtml('')}   
+    ${this.renderRowHtml(null)}   
                         `;
   }
 
