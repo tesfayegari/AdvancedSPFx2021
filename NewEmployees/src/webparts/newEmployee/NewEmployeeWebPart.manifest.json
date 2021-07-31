@@ -23,7 +23,8 @@
     "properties": {
       "description": "New Employees",
       "listName": "Employees",
-      "maxItems": 5
+      "maxItems": 5,
+      "viewType": "Table"
     }
   }]
 }
