@@ -7,7 +7,8 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { SPComponentLoader } from "@microsoft/sp-loader";
-import { SPHttpClient } from "@microsoft/sp-http";
+import SPService from './service/SPService';
+
 
 
 export interface INewEmployeeWebPartProps {
@@ -18,9 +19,11 @@ export interface INewEmployeeWebPartProps {
 }
 
 export default class NewEmployeeWebPart extends BaseClientSideWebPart<INewEmployeeWebPartProps> {
+  private service: SPService;
 
   public render(): void {    
     //injecting bootstrap css 
+    this.service = new SPService(this.context);
     let bootstrap4Url = 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css';
     SPComponentLoader.loadCss(bootstrap4Url);
     //end of bootstrap injection
@@ -28,7 +31,7 @@ export default class NewEmployeeWebPart extends BaseClientSideWebPart<INewEmploy
     console.log('Your Site Url is ', webUrl);
     const empListApiUrl = `${webUrl}/_api/web/lists/getbytitle('${this.properties.listName}')/items?$top=${this.properties.maxItems}`;
 
-    this.getSPData(empListApiUrl).then(response => {
+    this.service.getSPData(empListApiUrl).then(response => {
       
       console.log('Reading SharePoint Data Successfully ', response);
       let items = response.value;
@@ -41,14 +44,7 @@ export default class NewEmployeeWebPart extends BaseClientSideWebPart<INewEmploy
     }, error => console.error('Oops error occured', error));
          
   }
-
-  private getSPData(apiUrl: string) {
-     return this.context.spHttpClient
-      .get(apiUrl, SPHttpClient.configurations.v1)
-      .then(response => {
-        return response.json();
-      });
-  }
+ 
 
   private renderRowHtml(rows){
     let rowsHtml = '';
