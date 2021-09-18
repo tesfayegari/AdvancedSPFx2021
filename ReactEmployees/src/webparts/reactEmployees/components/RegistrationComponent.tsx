@@ -136,7 +136,12 @@ interface IRenderItemsProps {
   items: any[];
   count: number;
   columns: string[];
+  searchItems: (query)=>void;
+  enableNext: boolean;
+  enablePrev: boolean;
+  NextPage: ()=>void;
 }
+
 export const RenderItems = (props: IRenderItemsProps) => {
   let header = props.columns.map(column => <th scope="col">{column}</th>);
   let rows = [];
@@ -152,7 +157,7 @@ export const RenderItems = (props: IRenderItemsProps) => {
   }
   return (
     <>
-      <SearchItems></SearchItems>
+      <SearchItems searchItems={props.searchItems}></SearchItems>
       <table className="table">
         <thead>
           <tr>
@@ -163,19 +168,49 @@ export const RenderItems = (props: IRenderItemsProps) => {
           {rows}
         </tbody>
       </table>
-      <Pagination></Pagination>
-    </> 
+      <Pagination prevEnabled={props.enablePrev} nextEnabled={props.enableNext} NextPage={props.NextPage}></Pagination>
+    </>
   );
 }
 
-class SearchItems extends React.Component {
+export interface ISearchItemsState {
+  searchQuery: string;
+}
+export interface ISearchItemsProps {
+  searchItems: (query)=>void;
+}
+
+class SearchItems extends React.Component<ISearchItemsProps, ISearchItemsState> {
+  constructor(props) {
+    super(props);
+    this.state = { searchQuery: '' }
+  }
+
+  queryOnChange = (e) => {
+    console.log(e.target.value);
+    this.setState({ searchQuery: e.target.value });
+  }
+
+  searchClicked = ()=> {
+    console.log('The value of search is', this.state.searchQuery);
+    this.props.searchItems(this.state.searchQuery);
+  }
 
   public render() {
     return (
       <div className="input-group mb-3">
-        <input type="search" className="form-control" placeholder="Search ... " />
+        <input
+          type="search"
+          value={this.state.searchQuery}
+          onChange={(e) => this.queryOnChange(e)}
+          className="form-control"
+          placeholder="Search ... " />
         <div className="input-group-append">
-          <button className="btn btn-outline-primary" type="button" >Search</button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={this.searchClicked}
+          >Search</button>
         </div>
       </div>
     );
@@ -183,19 +218,31 @@ class SearchItems extends React.Component {
 
 }
 
-class Pagination extends React.Component {
+export interface IPaginationProps {
+  nextEnabled: boolean;
+  prevEnabled: boolean;
+  NextPage: ()=>void;
+}
+export interface IPaginationstate {
+
+}
+class Pagination extends React.Component<IPaginationProps, IPaginationstate> {
+
+  constructor(props: IPaginationProps){
+    super(props);
+  }
 
   public render() {
     return (
       <nav >
         <ul className="pagination justify-content-center">
-          <li className="page-item disabled">
+          <li className={`page-item ${this.props.prevEnabled? '' : 'disabled'}`}>
             <a className="page-link" href="#" >Previous</a>
           </li>
           <li className="page-item"><span>Page - 1</span></li>
 
-          <li className="page-item">
-            <a className="page-link" href="#">Next</a>
+          <li className={`page-item ${this.props.nextEnabled? '' : 'disabled'}`}>
+            <a className="page-link" href="#" onClick={this.props.NextPage}>Next</a>
           </li>
         </ul>
       </nav>

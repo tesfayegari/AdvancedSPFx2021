@@ -15,7 +15,7 @@ export const BlockedAlert = (p: IAlertProps) => (
     dismissButtonAriaLabel="Close"
     truncated={true}
     overflowButtonAriaLabel="See more"
-  >
+  >   
     <b>Blocked MessageBar - single line, with dismiss button and truncated text.</b> Truncation is not available if you
     use action buttons or multiline and should be used sparingly. Lorem ipsum dolor sit amet, consectetur adipiscing
     elit. Morbi luctus, purus a lobortis tristique, odio augue pharetra metus, ac placerat nunc mi nec dui. Vestibulum
