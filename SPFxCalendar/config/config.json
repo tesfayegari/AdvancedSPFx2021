@@ -18,6 +18,7 @@
     }
   },
   "localizedResources": {
-    "MyCalendarWebPartStrings": "lib/webparts/myCalendar/loc/{locale}.js"
+    "MyCalendarWebPartStrings": "lib/webparts/myCalendar/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
   }
 }

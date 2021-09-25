@@ -8,6 +8,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { EventInput } from '@fullcalendar/react'
 import Service from '../services/services';
+import { ColorClassNames } from '@uifabric/styling';
 
 export interface IMyCalendarState {
   events: EventInput[];
@@ -16,19 +17,32 @@ export interface IMyCalendarState {
 
 export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCalendarState> {
 
-  constructor(props: IMyCalendarProps){
+  constructor(props: IMyCalendarProps) {
     super(props);
-    this.state = {events: [], currentEvents: []};
+    this.state = { events: [], currentEvents: [] };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     //temporary code to test the Webservice call
     let srvc = new Service(this.props.context);
-    srvc.getCalendarEvents('281B14DB-D179-47EB-96B0-6632D93AC737')
-      .then(evts =>{
-        console.log('Data from Calendar List', evts);
-        this.setState({events: evts, currentEvents: evts});
-      } );
+
+    console.log('collection of Calendars', this.props.calendarCollection);
+    this.setState({ events: [], currentEvents: [] })
+    for (let cal of this.props.calendarCollection) {
+      console.log("Calendar ", cal);
+      srvc.getCalendarEvents(cal.calGUID, cal.siteUrl, cal.textColor, cal.backgroundColor)
+        .then(evts => {
+          console.log('Data from Calendar List', evts);
+          this.setState({ events: [...this.state.events,...evts]});
+        });
+    }
+
+
+    // srvc.getCalendarEvents('281B14DB-D179-47EB-96B0-6632D93AC737')
+    //   .then(evts => {
+    //     console.log('Data from Calendar List', evts);
+    //     this.setState({ events: evts, currentEvents: evts });
+    //   });
     //end of the code 
   }
 
@@ -89,43 +103,44 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
     //   }
     // ]
     return (
-      <div className={ styles.myCalendar }>
-        <h2>Calendar Coming soon .... </h2>
+      <div className={styles.myCalendar}>
+        <h2>{this.props.description}</h2>
         <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            }}
-            initialView='dayGridMonth'
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}//{this.state.weekendsVisible}
-            //initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-            events = {this.state.events}
-            select={this.handleDateSelect}
-            eventContent={renderEventContent} // custom render function
-            eventClick={this.handleEventClick}
-            //eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
-            /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
-          />
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          }}
+          initialView='dayGridMonth'
+          editable={true}
+          selectable={true}
+          selectMirror={true}
+          dayMaxEvents={true}
+          weekends={true}//{this.state.weekendsVisible}
+          //initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+          events={this.state.events}
+          select={this.handleDateSelect}
+          eventContent={renderEventContent} // custom render function
+          eventClick={this.handleEventClick}
+        //eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
+        /* you can update a remote database when these fire:
+        eventAdd={function(){}}
+        eventChange={function(){}}
+        eventRemove={function(){}}
+        */
+        />
       </div>
     );
   }
 }
 
-const renderEventContent=(eventContent: EventContentArg)=> {
+const renderEventContent = (eventContent: EventContentArg) => {
+  console.log(eventContent);
   return (
-    <>
-      <b>{eventContent.timeText}</b>
+    <div style={{ color: eventContent.textColor, backgroundColor: eventContent.backgroundColor }}>
+      <b>{eventContent.timeText} </b>
       <i>{eventContent.event.title}</i>
-    </>
+    </div>
   )
 }

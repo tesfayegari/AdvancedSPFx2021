@@ -7,9 +7,9 @@ export default class Service {
   constructor(private context: WebPartContext) { }
 
 
-  public makeRequest(listName: string): Promise<string> {
+  public makeRequest(listName: string, siteUrl: string = this.context.pageContext.web.absoluteUrl): Promise<string> {
 
-    let wsURL = this.context.pageContext.web.absoluteUrl + "/_vti_bin/Lists.asmx";
+    let wsURL = siteUrl + "/_vti_bin/Lists.asmx";
     var xmlCall = `
                         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                           <soap:Body>
@@ -63,10 +63,10 @@ export default class Service {
 
  
 
-  public getCalendarEvents(listGuid: string) {
+  public getCalendarEvents(listGuid: string, siteUrl: string = this.context.pageContext.web.absoluteUrl, txtColor: string = "#fff", bgColor: string = "#3788d8" ) {
     var result = [];
     //'5192cfe8-3a37-4545-8783-5c39f12f89ff'
-    return this.makeRequest(listGuid)
+    return this.makeRequest(listGuid, siteUrl)
       .then((data) => {
 
         //console.log('Output data is ', data);
@@ -93,8 +93,8 @@ export default class Service {
                category: $this.attr("ows_Category"),
                Recurrence: (rec === "1" ? true : false),
              },
-            color: '#fff',
-            backgroundColor: '#ff0000'
+             textColor: txtColor,
+             backgroundColor: bgColor
           });
         }
         return result;
