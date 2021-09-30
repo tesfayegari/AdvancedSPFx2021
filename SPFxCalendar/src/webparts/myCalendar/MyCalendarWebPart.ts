@@ -26,7 +26,7 @@ export default class MyCalendarWebPart extends BaseClientSideWebPart<IMyCalendar
       {
         description: this.properties.description, 
         context: this.context, 
-        calendarCollection: this.properties.collectionData
+        calendarCollection: this.properties.collectionData?this.properties.collectionData:[]
       }
     );
 

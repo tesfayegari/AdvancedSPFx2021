@@ -33,7 +33,7 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
       srvc.getCalendarEvents(cal.calGUID, cal.siteUrl, cal.textColor, cal.backgroundColor)
         .then(evts => {
           console.log('Data from Calendar List', evts);
-          this.setState({ events: [...this.state.events,...evts]});
+          this.setState({ events: [...this.state.events, ...evts] });
         });
     }
 
@@ -123,12 +123,13 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
           select={this.handleDateSelect}
           eventContent={renderEventContent} // custom render function
           eventClick={this.handleEventClick}
-        //eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
-        /* you can update a remote database when these fire:
-        eventAdd={function(){}}
-        eventChange={function(){}}
-        eventRemove={function(){}}
-        */
+          //eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
+          /* you can update a remote database when these fire:
+          eventAdd={function(){}}
+          eventChange={function(){}}
+          eventRemove={function(){}}
+          */    
+         
         />
       </div>
     );
