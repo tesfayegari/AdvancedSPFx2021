@@ -4,6 +4,7 @@ import * as $ from 'jquery';
 
 
 export default class Service {
+  private listItemEntityTypeName: string = undefined;
   constructor(private context: WebPartContext) { }
 
 
@@ -45,7 +46,7 @@ export default class Service {
     };
 
     console.log("About to make REST API request.");
-
+  
     return this.context.httpClient.post(
       wsURL,
       SPHttpClient.configurations.v1,
@@ -61,9 +62,9 @@ export default class Service {
       });
   }
 
- 
 
-  public getCalendarEvents(listGuid: string, siteUrl: string = this.context.pageContext.web.absoluteUrl, txtColor: string = "#fff", bgColor: string = "#3788d8" ) {
+
+  public getCalendarEvents(listGuid: string, siteUrl: string = this.context.pageContext.web.absoluteUrl, txtColor: string = "#fff", bgColor: string = "#3788d8") {
     var result = [];
     //'5192cfe8-3a37-4545-8783-5c39f12f89ff'
     return this.makeRequest(listGuid, siteUrl)
@@ -89,15 +90,72 @@ export default class Service {
             allDay: $this.attr("ows_fAllDayEvent") == "0" ? false : true,
             guid: ids[1],
             id: ids[0],
+            listGuid: listGuid,
             extendedProps: {
-               category: $this.attr("ows_Category"),
-               Recurrence: (rec === "1" ? true : false),
-             },
-             textColor: txtColor,
-             backgroundColor: bgColor
+              category: $this.attr("ows_Category"),
+              Recurrence: (rec === "1" ? true : false),
+            },
+            textColor: txtColor,
+            backgroundColor: bgColor
           });
         }
         return result;
       }, error => result);
   }
+
+  //Code Stolen from PNP Git Samples
+  public createItem(listName, newItemData) {
+    console.log('Creating item...');
+    return this.getListItemEntityTypeName(listName)
+      .then((listItemEntityTypeName: string): Promise<SPHttpClientResponse> => {
+        const body: string = JSON.stringify({
+          '__metadata': {
+            'type': listItemEntityTypeName
+          },
+          newItemData
+        });
+        return this.context.spHttpClient.post(`${this.context.pageContext.web.absoluteUrl}/_api/web/lists/getbytitle('${listName}')/items`,
+          SPHttpClient.configurations.v1,
+          {
+            headers: {
+              'Accept': 'application/json;odata=nometadata',
+              'Content-type': 'application/json;odata=verbose',
+              'odata-version': ''
+            },
+            body: body
+          });
+      })
+      .then((response: SPHttpClientResponse): Promise<any> => {
+        return response.json();
+      });
+
+  }
+
+  public getListItemEntityTypeName(listName): Promise<string> {
+    return new Promise<string>((resolve: (listItemEntityTypeName: string) => void, reject: (error: any) => void): void => {
+      if (this.listItemEntityTypeName) {
+        resolve(this.listItemEntityTypeName);
+        return;
+      }
+      this.context.spHttpClient.get(`${this.context.pageContext.web.absoluteUrl}/_api/web/lists/getbytitle('${listName}')?$select=ListItemEntityTypeFullName`,
+        SPHttpClient.configurations.v1,
+        {
+          headers: {
+            'Accept': 'application/json;odata=nometadata',
+            'odata-version': ''
+          }
+        })
+        .then((response: SPHttpClientResponse): Promise<{ ListItemEntityTypeFullName: string }> => {
+          return response.json();
+        }, (error: any): void => {
+          reject(error);
+        })
+        .then((response: { ListItemEntityTypeFullName: string }): void => {
+          this.listItemEntityTypeName = response.ListItemEntityTypeFullName;
+          resolve(this.listItemEntityTypeName);
+        });
+    });
+  }
+  //End of Code
+
 }

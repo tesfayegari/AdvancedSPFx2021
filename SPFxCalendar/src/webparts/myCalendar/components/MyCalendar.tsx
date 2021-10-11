@@ -1,6 +1,6 @@
 import * as React from 'react';
-import styles from './MyCalendar.module.scss';
 import { IMyCalendarProps } from './IMyCalendarProps';
+require("./CalStyle.css");
 
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -8,23 +8,29 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { EventInput } from '@fullcalendar/react'
 import Service from '../services/services';
-import { ColorClassNames } from '@uifabric/styling';
+import { NewEventForm } from './NewEvent';
+
 
 export interface IMyCalendarState {
   events: EventInput[];
   currentEvents: EventInput[];
+  showForm: boolean;
 }
 
 export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCalendarState> {
 
   constructor(props: IMyCalendarProps) {
     super(props);
-    this.state = { events: [], currentEvents: [] };
+    this.state = { events: [], currentEvents: [], showForm: false };
   }
 
   componentDidMount() {
     //temporary code to test the Webservice call
     let srvc = new Service(this.props.context);
+
+    //Testign CRUD Operation   
+    // srvc.createItem('EmployeeOffTime').then(data=>console.log('Item created successfully',data), error=>console.error('Oops error occured', error))
+    //End of Test
 
     console.log('collection of Calendars', this.props.calendarCollection);
     this.setState({ events: [], currentEvents: [] })
@@ -33,7 +39,7 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
       srvc.getCalendarEvents(cal.calGUID, cal.siteUrl, cal.textColor, cal.backgroundColor)
         .then(evts => {
           console.log('Data from Calendar List', evts);
-          this.setState({ events: [...this.state.events, ...evts] });
+          this.setState({ events: [...this.state.events, ...evts], currentEvents: [...this.state.events, ...evts] });
         });
     }
 
@@ -54,20 +60,22 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
 
   handleDateSelect = (selectInfo: DateSelectArg) => {
     console.log('Creating an event');
-    let title = prompt('Please enter a new title for your event')
-    let calendarApi = selectInfo.view.calendar
+    this.setState({showForm: true});
+    //return 
+    // let title = prompt('Please enter a new title for your event')
+    // let calendarApi = selectInfo.view.calendar
 
-    calendarApi.unselect() // clear date selection
+    // calendarApi.unselect() // clear date selection
 
-    if (title) {
-      calendarApi.addEvent({
-        id: this.createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay
-      })
-    }
+    // if (title) {
+    //   calendarApi.addEvent({
+    //     id: this.createEventId(),
+    //     title,
+    //     start: selectInfo.startStr,
+    //     end: selectInfo.endStr,
+    //     allDay: selectInfo.allDay
+    //   })
+    // }
   }
 
   handleEventClick = (clickInfo: EventClickArg) => {
@@ -77,6 +85,22 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
     window.open('https://google.com');
   }
 
+  handleFilter = (listGuid) => {
+    //TODO
+    console.log('Handling Calendar Event Filters', listGuid);
+    if(listGuid == "All"){
+      this.setState({currentEvents: this.state.events});
+    }else{
+      let filteredEvents = [];
+      for(let e of this.state.events){
+        if(e.listGuid == listGuid){
+          filteredEvents.push(e);
+        }
+      }
+      this.setState({currentEvents: filteredEvents});
+    }
+  }
+
   // handleEvents = (events: EventApi[]) => {
   //   this.setState({
   //     currentEvents: events
@@ -84,64 +108,78 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
   // }
 
   public render(): React.ReactElement<IMyCalendarProps> {
-    //let todayStr = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
-    // const INITIAL_EVENTS:  EventInput[] = this.state.events.length >0 ? this.state.events :  [
-    //   {
-    //     id: this.createEventId(),
-    //     title: 'All-day event',
-    //     start: todayStr,
-    //     color:"#ff0000"
-    //   },
-    //   {
-    //     id: this.createEventId(),
-    //     title: 'Timed event',
-    //     start: todayStr + 'T12:00:00',
-    //   },{
-    //     id: '3', 
-    //     title: 'Demo Event',
-    //     start: '2021-09-22T06:00:00'
-    //   }
-    // ]
+    console.log('State of the My Calendar', this.state);
     return (
-      <div className={styles.myCalendar}>
-        <h2>{this.props.description}</h2>
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-          }}
-          initialView='dayGridMonth'
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          dayMaxEvents={true}
-          weekends={true}//{this.state.weekendsVisible}
-          //initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-          events={this.state.events}
-          select={this.handleDateSelect}
-          eventContent={renderEventContent} // custom render function
-          eventClick={this.handleEventClick}
+      <div className="demo-app">
+        {renderSidebar(this.props.calendarCollection, this.handleFilter)}
+        <div className="demo-app-main">
+          <h2 className="text-center">{this.props.description}</h2>
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            initialView='dayGridMonth'
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={true}//{this.state.weekendsVisible}
+            //initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+            events={this.state.currentEvents}
+            select={this.handleDateSelect}
+            eventContent={renderEventContent} // custom render function
+            eventClick={this.handleEventClick}
           //eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
           /* you can update a remote database when these fire:
           eventAdd={function(){}}
           eventChange={function(){}}
           eventRemove={function(){}}
-          */    
-         
-        />
+          */
+
+          />
+          <NewEventForm showForm={this.state.showForm} description="This seems good"></NewEventForm>
+        </div>
       </div>
     );
   }
 }
 
 const renderEventContent = (eventContent: EventContentArg) => {
-  console.log(eventContent);
+  //console.log(eventContent);
   return (
     <div style={{ color: eventContent.textColor, backgroundColor: eventContent.backgroundColor }}>
-      <b>{eventContent.timeText} </b>
-      <i>{eventContent.event.title}</i>
+      <b>{eventContent.timeText}</b>
+      <i>{eventContent.event.title.substring(0, 9) + (eventContent.event.title.length > 9 ? '..' : '')}</i>
+    </div>
+  )
+}
+
+const renderSidebar = (collection, handleFilter) => {
+  console.log('Props in renderSidebar', collection);
+  return (
+    <div className='demo-app-sidebar'>
+      <div className="sidebar-header">
+        <b>Legends</b>
+      </div>
+      <div className="sidebar-calendars">
+        <ul className="list-group">
+          <li className="list-group-item list-group-item-action"
+            style={{ backgroundColor: "#c55303", color: "#fff" }}
+            onClick={() => handleFilter("All")}>
+            All Events
+          </li>
+          {collection.map(
+            item => <li
+              style={{ backgroundColor: item.backgroundColor, color: item.textColor }} className="list-group-item list-group-item-action"
+              onClick={() => handleFilter(item.calGUID)}>
+              {item.calName}
+            </li>
+          )}
+        </ul>
+      </div>
     </div>
   )
 }

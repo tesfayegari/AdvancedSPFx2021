@@ -8,8 +8,12 @@ import {
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 
+import { SPComponentLoader } from "@microsoft/sp-loader";
+
 import MyCalendar from './components/MyCalendar';
 import { IMyCalendarProps } from './components/IMyCalendarProps';
+
+// import { Pane } from "@microsoft/office-ui-fabric-react";
 
 
 export interface IMyCalendarWebPartProps {
@@ -21,12 +25,13 @@ export default class MyCalendarWebPart extends BaseClientSideWebPart<IMyCalendar
 
   public render(): void {    
     //console.log('Calendar Collection is ', this.properties.collectionData)
+    SPComponentLoader.loadCss("https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css");
     const element: React.ReactElement<IMyCalendarProps> = React.createElement(
       MyCalendar,
       {
         description: this.properties.description, 
         context: this.context, 
-        calendarCollection: this.properties.collectionData?this.properties.collectionData:[]
+        calendarCollection: this.properties.collectionData ? this.properties.collectionData:[]
       }
     );
 
