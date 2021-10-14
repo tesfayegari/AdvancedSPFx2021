@@ -46,7 +46,7 @@ export default class Service {
     };
 
     console.log("About to make REST API request.");
-  
+
     return this.context.httpClient.post(
       wsURL,
       SPHttpClient.configurations.v1,
@@ -112,7 +112,7 @@ export default class Service {
           '__metadata': {
             'type': listItemEntityTypeName
           },
-          newItemData
+          ...newItemData
         });
         return this.context.spHttpClient.post(`${this.context.pageContext.web.absoluteUrl}/_api/web/lists/getbytitle('${listName}')/items`,
           SPHttpClient.configurations.v1,

@@ -24,6 +24,34 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
     this.state = { events: [], currentEvents: [], showForm: false };
   }
 
+  submitItem = (event)=>{
+    let srvc = new Service(this.props.context);
+
+    
+    event.EventDate = (new Date(event.EventDate)).toISOString();
+    //event.EndDate = (new Date(event.EndDate)).toISOString();
+    console.log("About to submit the new Event ", event);
+    
+    event.Department="IT";
+    event.fRecurrence = true;
+    event.EventType=1;
+    event.RecurrenceData =`<recurrence><rule>
+    <firstDayOfWeek>su</firstDayOfWeek>
+    <repeat><daily dayFrequency="1" /></repeat>    
+    <repeatForever>FALSE</repeatForever>  
+    </rule></recurrence>`;
+    srvc.createItem('EmployeeOffTime', event).then(
+      data=>{
+        console.log('Item created successfully',data);
+        this.componentDidMount();
+      }, error=>{
+        console.error('Oops error occured', error);
+      });
+    
+    this.handleFormClosing()
+    //End of Test
+  }
+
   componentDidMount() {
     //temporary code to test the Webservice call
     let srvc = new Service(this.props.context);
@@ -107,6 +135,11 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
   //   })
   // }
 
+  handleFormClosing = () =>{ 
+    console.log('Closing the Panel');
+    this.setState({showForm: false});
+  }
+
   public render(): React.ReactElement<IMyCalendarProps> {
     console.log('State of the My Calendar', this.state);
     return (
@@ -140,7 +173,8 @@ export default class MyCalendar extends React.Component<IMyCalendarProps, IMyCal
           */
 
           />
-          <NewEventForm showForm={this.state.showForm} description="This seems good"></NewEventForm>
+          <NewEventForm handleClose={()=>this.handleFormClosing()} showForm={this.state.showForm} description="This seems good" handleSave={this.submitItem}></NewEventForm>
+          
         </div>
       </div>
     );

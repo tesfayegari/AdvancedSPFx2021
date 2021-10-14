@@ -18,7 +18,7 @@ import { IMyCalendarProps } from './components/IMyCalendarProps';
 
 export interface IMyCalendarWebPartProps {
   description: string;
-  collectionData: any[];
+  collectionData: any[];  
 }
 
 export default class MyCalendarWebPart extends BaseClientSideWebPart<IMyCalendarWebPartProps> {
